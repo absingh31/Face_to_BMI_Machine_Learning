@@ -12,46 +12,38 @@ import sklearn
 INPUT_PATH = 'INPUT/'
 
 def get_landmarks(im):
-    PREDICTOR_PATH = "shape_predictor_68_face_landmarks.dat"
-    predictor = dlib.shape_predictor(PREDICTOR_PATH)
-    cascade_path='haarcascade_frontalface_default.xml'
-    cascade = cv2.CascadeClassifier(cascade_path)
-
-    rects = cascade.detectMultiScale(im, 1.3,5)
-
-    if len(rects) > 0:
-        x,y,w,h =rects[0]
-        rect=dlib.rectangle(int(x),int(y),int(x+w),int(y+h))
-        return numpy.matrix([[p.x, p.y] for p in predictor(im, rect).parts()])
-    else:
-        return 0
+	PREDICTOR_PATH = "shape_predictor_68_face_landmarks.dat"
+	predictor = dlib.shape_predictor(PREDICTOR_PATH)
+	cascade_path='haarcascade_frontalface_default.xml'
+	cascade = cv2.CascadeClassifier(cascade_path)
+	rects = cascade.detectMultiScale(im, 1.3,5)
+	if len(rects) > 0:
+		x,y,w,h =rects[0]
+		rect=dlib.rectangle(int(x),int(y),int(x+w),int(y+h))
+		return numpy.matrix([[p.x, p.y] for p in predictor(im, rect).parts()])
+	else:
+		return 0
 
 def predict(image_name_list):
-    collect_landmarks = []
-
-    for image_name in image_name_list:
-        img=cv2.imread(INPUT_PATH+image_name)
-        landmark_list = get_landmarks(img)
-        if isinstance(landmark_list,int) == False:
-            collect_landmarks.append([image_name,landmark_list.tolist()])
-
-    inmate_2d_list = []
-
-    num_inmates = len(collect_landmarks)
-
-    for each_inmate in range(0,num_inmates):
-        inmate_1d_list = []
-        inmate_id_landmark = collect_landmarks[each_inmate][0]
-        inmate_1d_list.append(inmate_id_landmark)
-        for each_landmark in range(0,68):
-            landx = collect_landmarks[each_inmate][1][each_landmark][0]
-            inmate_1d_list.append(landx)
-            landy = collect_landmarks[each_inmate][1][each_landmark][1]
-            inmate_1d_list.append(landy)
-        inmate_2d_list.append(inmate_1d_list)
-
-
-    df_col_names = ['image_name',
+	collect_landmarks = []
+	for image_name in image_name_list:
+	img=cv2.imread(INPUT_PATH+image_name)
+	landmark_list = get_landmarks(img)
+	if isinstance(landmark_list,int) == False:
+	collect_landmarks.append([image_name,landmark_list.tolist()])
+	inmate_2d_list = []
+	num_inmates = len(collect_landmarks)
+	for each_inmate in range(0,num_inmates):
+		inmate_1d_list = []
+		inmate_id_landmark = collect_landmarks[each_inmate][0]
+		inmate_1d_list.append(inmate_id_landmark)
+		for each_landmark in range(0,68):
+			landx = collect_landmarks[each_inmate][1][each_landmark][0]
+			inmate_1d_list.append(landx)
+			landy = collect_landmarks[each_inmate][1][each_landmark][1]
+			inmate_1d_list.append(landy)
+			inmate_2d_list.append(inmate_1d_list)
+df_col_names = ['image_name',
     'landx0',
     'landy0',
     'landx1',

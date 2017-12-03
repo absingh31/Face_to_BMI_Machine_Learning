@@ -190,53 +190,45 @@ def predict(image_name_list):
     'landy67']
 
 
-    df_landmark = pd.DataFrame(inmate_2d_list,columns=df_col_names)
+df_landmark = pd.DataFrame(inmate_2d_list,columns=df_col_names)
+with open('rf_model_v3.pkl', 'rb') as f:
+	rf = pickle.dumps(f)	
+	rf = pickle.load(f)
 
-    with open('rf_model_v3.pkl', 'rb') as f:
-        rf = pickle.load(f)
+bmi_data = df_landmark.copy()
 
-    bmi_data = df_landmark.copy()
+def calc_dist(x0,y0,x1,y1):
+	dist = (x0-x1)**2 + (y0-y1)**2
+	dist = dist ** 0.5
+	return dist
 
-    def calc_dist(x0,y0,x1,y1):
-        dist = (x0-x1)**2 + (y0-y1)**2
-        dist = dist ** 0.5
-        return dist
-
-    bmi_data['face_width0'] = calc_dist(bmi_data['landx0'],bmi_data['landy0'],bmi_data['landx16'],bmi_data['landy16'])
-    bmi_data['face_width1'] = calc_dist(bmi_data['landx1'],bmi_data['landy1'],bmi_data['landx15'],bmi_data['landy15'])
-    bmi_data['face_width2'] = calc_dist(bmi_data['landx2'],bmi_data['landy2'],bmi_data['landx14'],bmi_data['landy14'])
-    bmi_data['face_width3'] = calc_dist(bmi_data['landx3'],bmi_data['landy3'],bmi_data['landx13'],bmi_data['landy13'])
-    bmi_data['face_width4'] = calc_dist(bmi_data['landx4'],bmi_data['landy4'],bmi_data['landx12'],bmi_data['landy12'])
-    bmi_data['face_width5'] = calc_dist(bmi_data['landx5'],bmi_data['landy5'],bmi_data['landx11'],bmi_data['landy11'])
-    bmi_data['face_width6'] = calc_dist(bmi_data['landx6'],bmi_data['landy6'],bmi_data['landx10'],bmi_data['landy10'])
-    bmi_data['face_width7'] = calc_dist(bmi_data['landx7'],bmi_data['landy7'],bmi_data['landx9'],bmi_data['landy9'])
-
-    bmi_data['face_height'] = calc_dist(bmi_data['landx27'],bmi_data['landy27'],bmi_data['landx8'],bmi_data['landy8'])
-
-    bmi_data['eye_width1'] = calc_dist(bmi_data['landx36'],bmi_data['landy36'],bmi_data['landx45'],bmi_data['landy45'])
-    bmi_data['eye_width2'] = calc_dist(bmi_data['landx39'],bmi_data['landy39'],bmi_data['landx42'],bmi_data['landy42'])
-
-
-    bmi_data['face_ratio2']=bmi_data['face_width2']/bmi_data['face_width1']
-    bmi_data['face_ratio3']=bmi_data['face_width3']/bmi_data['face_width1']
-    bmi_data['face_ratio4']=bmi_data['face_width4']/bmi_data['face_width1']
-    bmi_data['face_ratio5']=bmi_data['face_width5']/bmi_data['face_width1']
-    bmi_data['face_ratio6']=bmi_data['face_width6']/bmi_data['face_width1']
-    bmi_data['face_ratio7']=bmi_data['face_width7']/bmi_data['face_width1']
-
-    bmi_data['face_ratioh1']=bmi_data['face_width1']/bmi_data['face_height']
-    bmi_data['face_ratioh2']=bmi_data['face_width2']/bmi_data['face_height']
-    bmi_data['face_ratioh3']=bmi_data['face_width3']/bmi_data['face_height']
-    bmi_data['face_ratioh4']=bmi_data['face_width4']/bmi_data['face_height']
-    bmi_data['face_ratioh5']=bmi_data['face_width5']/bmi_data['face_height']
-    bmi_data['face_ratioh6']=bmi_data['face_width6']/bmi_data['face_height']
-    bmi_data['face_ratioh7']=bmi_data['face_width7']/bmi_data['face_height']
-
-    bmi_data['eye_ratio1']=(bmi_data['eye_width1']-bmi_data['eye_width2'])/bmi_data['face_width0']
-    bmi_data['eye_ratio2']=(bmi_data['eye_width1']-bmi_data['eye_width2'])/bmi_data['face_height']
-
-
-    feature_list = [
+bmi_data['face_width0'] = calc_dist(bmi_data['landx0'],bmi_data['landy0'],bmi_data['landx16'],bmi_data['landy16'])
+bmi_data['face_width1'] = calc_dist(bmi_data['landx1'],bmi_data['landy1'],bmi_data['landx15'],bmi_data['landy15'])
+bmi_data['face_width2'] = calc_dist(bmi_data['landx2'],bmi_data['landy2'],bmi_data['landx14'],bmi_data['landy14'])
+bmi_data['face_width3'] = calc_dist(bmi_data['landx3'],bmi_data['landy3'],bmi_data['landx13'],bmi_data['landy13'])
+bmi_data['face_width4'] = calc_dist(bmi_data['landx4'],bmi_data['landy4'],bmi_data['landx12'],bmi_data['landy12'])
+bmi_data['face_width5'] = calc_dist(bmi_data['landx5'],bmi_data['landy5'],bmi_data['landx11'],bmi_data['landy11'])
+bmi_data['face_width6'] = calc_dist(bmi_data['landx6'],bmi_data['landy6'],bmi_data['landx10'],bmi_data['landy10'])
+bmi_data['face_width7'] = calc_dist(bmi_data['landx7'],bmi_data['landy7'],bmi_data['landx9'],bmi_data['landy9'])
+bmi_data['face_height'] = calc_dist(bmi_data['landx27'],bmi_data['landy27'],bmi_data['landx8'],bmi_data['landy8'])
+bmi_data['eye_width1'] = calc_dist(bmi_data['landx36'],bmi_data['landy36'],bmi_data['landx45'],bmi_data['landy45'])
+bmi_data['eye_width2'] = calc_dist(bmi_data['landx39'],bmi_data['landy39'],bmi_data['landx42'],bmi_data['landy42'])
+bmi_data['face_ratio2']=bmi_data['face_width2']/bmi_data['face_width1']
+bmi_data['face_ratio3']=bmi_data['face_width3']/bmi_data['face_width1']
+bmi_data['face_ratio4']=bmi_data['face_width4']/bmi_data['face_width1']
+bmi_data['face_ratio5']=bmi_data['face_width5']/bmi_data['face_width1']
+bmi_data['face_ratio6']=bmi_data['face_width6']/bmi_data['face_width1']
+bmi_data['face_ratio7']=bmi_data['face_width7']/bmi_data['face_width1']
+bmi_data['face_ratioh1']=bmi_data['face_width1']/bmi_data['face_height']
+bmi_data['face_ratioh2']=bmi_data['face_width2']/bmi_data['face_height']
+bmi_data['face_ratioh3']=bmi_data['face_width3']/bmi_data['face_height']
+bmi_data['face_ratioh4']=bmi_data['face_width4']/bmi_data['face_height']
+bmi_data['face_ratioh5']=bmi_data['face_width5']/bmi_data['face_height']
+bmi_data['face_ratioh6']=bmi_data['face_width6']/bmi_data['face_height']
+bmi_data['face_ratioh7']=bmi_data['face_width7']/bmi_data['face_height']
+bmi_data['eye_ratio1']=(bmi_data['eye_width1']-bmi_data['eye_width2'])/bmi_data['face_width0']
+bmi_data['eye_ratio2']=(bmi_data['eye_width1']-bmi_data['eye_width2'])/bmi_data['face_height']
+feature_list = [
     'face_ratio2',
     'face_ratio3',
     'face_ratio4',
@@ -253,13 +245,11 @@ def predict(image_name_list):
     'eye_ratio1',
     'eye_ratio2']                
 
-    results = rf.predict_proba(bmi_data[feature_list])
-    bmi_data['score_bmi30'] = results[:,1]
-
-    output = 'img_BMI_prediction.csv'
-    bmi_data[['image_name','score_bmi30']].to_csv(output)
-
-    print("Prediction Output File: {}".format(output))
+results = rf.predict_proba(bmi_data[feature_list])
+bmi_data['score_bmi30'] = results[:,1]
+output = 'img_BMI_prediction.csv'
+bmi_data[['image_name','score_bmi30']].to_csv(output)
+print("Prediction Output File: {}".format(output))
 
 #--------------------------------------------------------------------------
 

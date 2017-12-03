@@ -27,10 +27,10 @@ def get_landmarks(im):
 def predict(image_name_list):
 	collect_landmarks = []
 	for image_name in image_name_list:
-	img=cv2.imread(INPUT_PATH+image_name)
-	landmark_list = get_landmarks(img)
-	if isinstance(landmark_list,int) == False:
-	collect_landmarks.append([image_name,landmark_list.tolist()])
+		img = cv2.imread(INPUT_PATH+image_name)
+		landmark_list = get_landmarks(img)
+		if isinstance(landmark_list,int) == False:
+			collect_landmarks.append([image_name,landmark_list.tolist()])
 	inmate_2d_list = []
 	num_inmates = len(collect_landmarks)
 	for each_inmate in range(0,num_inmates):
